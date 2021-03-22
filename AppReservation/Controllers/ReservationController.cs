@@ -28,9 +28,9 @@ namespace AppReservation.Controllers
         // GET: ReservationController
         public IActionResult Index()
         {
-            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv);
+            var list = (_context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv)).ToList();
             //ViewBag.role = new IdentityRole();
-            return View(list.ToList());
+            return View(list);
         }
 
         // GET: ReservationController/Details/5
@@ -55,9 +55,7 @@ namespace AppReservation.Controllers
             if (ModelState.IsValid)
             {
                 var type = _context.TypeReservations.Where(r => r.Id == reservation.ReservId).FirstOrDefault();
-
                 var student = await _userManager.GetUserAsync(HttpContext.User);
-
 
                 var reser = new Reservation();
                 reser.Status = reservation.Status;
