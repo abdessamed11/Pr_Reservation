@@ -7592,11 +7592,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Administrateur\\OneDrive\\Bureau\\Application-web-reservation-en-ligne-main\\AppReservation\\AppReservation\\AppReservation.csproj",
+      "projectUniqueName": "C:\\Users\\Administrateur\\OneDrive\\Bureau\\Pr_Reservation\\AppReservation\\AppReservation.csproj",
       "projectName": "AppReservation",
-      "projectPath": "C:\\Users\\Administrateur\\OneDrive\\Bureau\\Application-web-reservation-en-ligne-main\\AppReservation\\AppReservation\\AppReservation.csproj",
+      "projectPath": "C:\\Users\\Administrateur\\OneDrive\\Bureau\\Pr_Reservation\\AppReservation\\AppReservation.csproj",
       "packagesPath": "C:\\Users\\Administrateur\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Administrateur\\OneDrive\\Bureau\\Application-web-reservation-en-ligne-main\\AppReservation\\AppReservation\\obj\\",
+      "outputPath": "C:\\Users\\Administrateur\\OneDrive\\Bureau\\Pr_Reservation\\AppReservation\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"

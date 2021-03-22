@@ -76,63 +76,59 @@ namespace AppReservation.Controllers
             return View(reservation);
         }
 
-        // POST: ReservationController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        /*public async Task <ActionResult> Create(Reservation reservation)
+        
+        public ActionResult Edit(int? id)
         {
-            try
-            {
-                await _context.Reservations.AddAsync(reservation);
-                
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }*/
-
-        // GET: ReservationController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
+            var getid = _context.Reservations.Find(id);
+            ViewBag.gettype = _context.TypeReservations.ToList();
+            return View(getid);
         }
 
-        // POST: ReservationController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(Reservation reservation)
         {
-            try
+
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                var type = _context.TypeReservations.Where(r => r.Id == reservation.ReservId).FirstOrDefault();
+                //reservation.ReservationType.Id = type.ToString();
+                var student = await _userManager.GetUserAsync(HttpContext.User);
+                //var studentId = student.Id;
+
+
+                reservation.StudentId = student.Id;
+                reservation.ReservId = type.Id;
+
+                _context.Update(reservation);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("index");
             }
-            catch
-            {
-                return View();
-            }
+
+            return View(reservation);
         }
 
-        // GET: ReservationController/Delete/5
-        public ActionResult Delete(int id)
+        public IActionResult Delete(int? id)
         {
-            return View();
+            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv);
+            ViewBag.data = list.AsEnumerable();
+            if (id == null)
+            {
+                return RedirectToAction("Index");
+            }
+            var del = _context.Reservations.Find(id);
+            return View(del);
         }
 
-        // POST: ReservationController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult Delete(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+
+            var del = _context.Reservations.Find(id);
+            _context.Reservations.Remove(del);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }
