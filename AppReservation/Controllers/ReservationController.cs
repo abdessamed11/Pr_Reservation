@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AppReservation.ViewModels;
+using NToastNotify;
 
 namespace AppReservation.Controllers
 {
@@ -17,20 +18,53 @@ namespace AppReservation.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IToastNotification _toastNotification;
 
-        public ReservationController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public ReservationController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IToastNotification toastNotification)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _toastNotification = toastNotification;
         }
 
-        // GET: ReservationController
-        public IActionResult Index()
+        public IActionResult Idx()
         {
-            var list = (_context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv)).ToList();
-            //ViewBag.role = new IdentityRole();
-            return View(list);
+
+            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv)
+                
+                .OrderBy(c => c.Student.ResCount);
+            ViewBag.role = new IdentityRole();
+            return View(list.ToList().Where(d => d.Date >= DateTime.Today||d.Date.DayOfWeek == DayOfWeek.Saturday || d.Date.DayOfWeek == DayOfWeek.Sunday));
+                
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole("Student"))
+                {
+                    await GetDataByUser();
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    Idx();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            return View();
+
+        }
+
+        public async Task<IActionResult> GetDataByUser()
+        {
+            var student = await _userManager.GetUserAsync(HttpContext.User);
+            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv).Where(s => s.StudentId == student.Id);
+            return View("Index", list.ToList());
         }
 
         // GET: ReservationController/Details/5
@@ -127,6 +161,67 @@ namespace AppReservation.Controllers
             _context.Reservations.Remove(del);
             _context.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public void Increment(int id)
+        {
+            var usr = _context.Reservations.Find(id);
+            //var res = new Student();
+            //var inc = usr.Student.resCount;
+            //var incr = new Student().resCount;
+            
+            //var student = await _userManager.GetUserAsync(HttpContext.User);
+            var u = _context.Students.FirstOrDefault(s => s.Id == usr.StudentId);
+            var inc = usr.Student.ResCount;
+            u.ResCount = inc + 1;
+            //int inc = Convert.ToInt32(usr.Student.resCount.ToString());
+            //res.resCount += inc;
+            //usr.Student.resCount = incr + 1;
+            _context.Update(usr);
+            _context.Update(u);
+             _context.SaveChanges();
+        }
+
+        public async Task<IActionResult> Confirm(int id)
+        {
+            var resr = _context.Reservations.Find(id);
+            if(resr.Status != "Approved")
+            {
+                Increment(id);
+                //var app = new Reservation();
+                resr.Status = "Approved";
+                _context.Update(resr);
+                await _context.SaveChangesAsync();
+                _toastNotification.AddSuccessToastMessage("Reservation approved");
+            }
+            else
+            {
+                _toastNotification.AddErrorToastMessage("Reservation already approved");
+            }
+            
+            return RedirectToAction("index");
+        }
+
+        public IActionResult Decline(int id)
+        {
+            var resr = _context.Reservations.Find(id);
+
+            if (resr.Status != "Declined")
+            {
+                //var app = new Reservation();
+                resr.Status = "Declined";
+                _context.Update(resr);
+                _context.SaveChanges();
+                _toastNotification.AddWarningToastMessage("Reservation declined");
+                
+            }
+            else
+            {
+                _toastNotification.AddErrorToastMessage("Reservation already declined");
+            }
+
+            return RedirectToAction("index");
+
         }
     }
 }

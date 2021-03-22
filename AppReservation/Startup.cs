@@ -32,18 +32,35 @@ namespace AppReservation
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            
+            services.AddDefaultIdentity<IdentityUser>(options => { 
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 4;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredUniqueChars = 0;
+            })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddNToastNotifyNoty(new NToastNotify.NotyOptions()
+                {
+                    ProgressBar = true, //Showing progressbar
+                                        //PositionClass = ToastPositions.TopRight,
+                    Timeout = 4000, //time the notification takes to disappear (ms)
+                    Theme = "mint" //theme name Notify.Js
+                });
             services.AddMvc(options =>
             {
                 options.EnableEndpointRouting = false;  // for accept ouwn routing
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
-
+            
             }).AddXmlSerializerFormatters();
             services.AddRazorPages();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +77,7 @@ namespace AppReservation
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseNToastNotify();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

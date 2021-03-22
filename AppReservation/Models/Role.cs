@@ -8,9 +8,17 @@ namespace AppReservation.Models
 {
     public class Role
     {
-        [Required(ErrorMessage = "The role name field is required !")]
-        [Display(Name = "Enter The Name")]
-        
+        public Role()
+        {
+            Users = new List<string>();
+        }
+
+        public string Id { get; set; }
+
+        [Required]
         public string RoleName { get; set; }
+
+        public List<string> Users { get; set; }
     }
 }
+
