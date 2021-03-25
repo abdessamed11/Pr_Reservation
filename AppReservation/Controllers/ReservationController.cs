@@ -34,9 +34,84 @@ namespace AppReservation.Controllers
             var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv)
                 
                 .OrderBy(c => c.Student.ResCount);
+            
             ViewBag.role = new IdentityRole();
             return View(list.ToList().Where(d => d.Date >= DateTime.Today||d.Date.DayOfWeek == DayOfWeek.Saturday || d.Date.DayOfWeek == DayOfWeek.Sunday));
                 
+        }
+
+        public IActionResult Idxx()
+        {
+
+            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv);
+
+            ViewBag.role = new IdentityRole();
+            return View(list.ToList().Where(d => d.Status == "Approved" && d.Date >= DateTime.Today));
+
+        }
+
+        public IActionResult Idxxx()
+        {
+
+            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv);
+
+            ViewBag.role = new IdentityRole();
+            return View(list.ToList().Where(d => d.Status == "Declined" && d.Date >= DateTime.Today));
+
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> Index(DateTime dates)
+        //{
+        //    ViewData["getetudiant"] = dates;
+        //    var etudquery = (from x in _context.Reservations select x).Include(s => s.Student).Include(rt => rt.Reserv).Where(x => x.Date == dates);
+        //    //if (!string.IsNullOrEmpty(dates))
+        //    //{
+        //    //    etudquery = etudquery;
+        //    //}
+        //    return View(await etudquery.AsNoTracking().ToListAsync());
+        //}
+
+        public async Task<IActionResult> Approuved()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole("Student"))
+                {
+                    await GetDataByUser();
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    Idxx();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            return View();
+
+        }
+
+        public async Task<IActionResult> Declined()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole("Student"))
+                {
+                    await GetDataByUser();
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    Idxxx();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            return View();
+
         }
 
         public async Task<IActionResult> Index()
@@ -201,6 +276,29 @@ namespace AppReservation.Controllers
             
             return RedirectToAction("index");
         }
+
+        //public IActionResult tconfirm()
+        //{
+        //    var Result = (from c in _context.Reservations.Where(c => c.Status == "pending") select c).Single();
+
+        //    Result.Status = "approuved";
+
+        //    _context.Update(Result);
+        //    _context.SaveChanges();
+        //    return RedirectToAction("Index");
+
+        //}
+        //[HttpGet]
+        //public async Task<IActionResult> Index(string searchString)
+        //{
+        //    ViewData["getetudiant"] = searchString;
+        //    var etudquery = from x in _context.Reservations select x;
+        //    if (!string.IsNullOrEmpty(searchString))
+        //    {
+        //        etudquery = etudquery.Where(x => x.Cause.Contains(searchString));
+        //    }
+        //    return View(await etudquery.AsNoTracking().ToListAsync());
+        //}
 
         public IActionResult Decline(int id)
         {

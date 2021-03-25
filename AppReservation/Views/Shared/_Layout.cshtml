@@ -23,17 +23,35 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="reservation" asp-action="index">Reservation</a>
                         </li>
-                        
                         @if (User.Identity.IsAuthenticated)
                         {
                             if (User.IsInRole("Admin"))
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="admin" asp-action="index">Role</a>
-                                </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="reservation" asp-action="Approuved">Approuved</a>
+                            </li>}
+                                }
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            if (User.IsInRole("Admin"))
+                            {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="reservation" asp-action="Declined">Declined</a>
+                            </li>
                             }
                         }
-                    </ul>
+
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                            if (User.IsInRole("Admin"))
+                                            {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="admin" asp-action="index">Role</a>
+                    </li>
+}
+            }
+                                                        </ul>
                 </div>
             </div>
         </nav>

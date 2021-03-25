@@ -20,7 +20,7 @@ namespace AppReservation.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index() 
         {
             var roles = roleManager.Roles;
             return View(roles);
