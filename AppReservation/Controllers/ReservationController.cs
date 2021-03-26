@@ -59,6 +59,17 @@ namespace AppReservation.Controllers
             return View(list.ToList().Where(d => d.Status == "Declined" && d.Date >= DateTime.Today));
 
         }
+
+        public IActionResult Pend()
+        {
+
+            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv);
+
+            ViewBag.role = new IdentityRole();
+            return View(list.ToList().Where(d => d.Status == "pending" && d.Date >= DateTime.Today));
+
+        }
+
         [HttpPost]
         public ActionResult Index(DateTime? dates)
         {
@@ -103,6 +114,27 @@ namespace AppReservation.Controllers
                 else if (User.IsInRole("Admin"))
                 {
                     Idxxx();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            return View();
+
+        }
+
+        public async Task<IActionResult> Pending()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole("Student"))
+                {
+                    await GetDataByUser();
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    Pend();
                 }
                 else
                 {

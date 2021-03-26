@@ -898,3 +898,4 @@ C:\Users\Administrateur\OneDrive\Bureau\Pr_Reservation\AppReservation\bin\Debug\
 C:\Users\Administrateur\OneDrive\Bureau\Pr_Reservation\AppReservation\obj\Debug\net5.0\Razor\Views\Reservation\Approuved.cshtml.g.cs
 C:\Users\Administrateur\OneDrive\Bureau\Pr_Reservation\AppReservation\obj\Debug\net5.0\Razor\Views\Shared\_Layou.cshtml.g.cs
 C:\Users\Administrateur\OneDrive\Bureau\Pr_Reservation\AppReservation\obj\Debug\net5.0\Razor\Views\Reservation\Declined.cshtml.g.cs
+C:\Users\Administrateur\OneDrive\Bureau\Pr_Reservation\AppReservation\obj\Debug\net5.0\Razor\Views\Reservation\Pending.cshtml.g.cs
