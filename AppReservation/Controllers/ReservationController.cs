@@ -59,21 +59,20 @@ namespace AppReservation.Controllers
             return View(list.ToList().Where(d => d.Status == "Declined" && d.Date >= DateTime.Today));
 
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> Index(DateTime dates)
-        //{
-        //    ViewData["getetudiant"] = dates;
-        //    var etudquery = (from x in _context.Reservations select x).Include(s => s.Student).Include(rt => rt.Reserv).Where(x => x.Date == dates);
-        //    //if (!string.IsNullOrEmpty(dates))
-        //    //{
-        //    //    etudquery = etudquery;
-        //    //}
-        //    return View(await etudquery.AsNoTracking().ToListAsync());
-        //}
+        [HttpPost]
+        public ActionResult Index(DateTime? dates)
+        {
+            var tb_visitas = _context.Reservations
+                .Include(s => s.Student)
+                .Include(rt => rt.Reserv)
+              .Where(t => t.Date == dates);
+            return View(tb_visitas.ToList());
+        }
 
         public async Task<IActionResult> Approuved()
         {
+            
+
             if (User.Identity.IsAuthenticated)
             {
                 if (User.IsInRole("Student"))
