@@ -17,7 +17,6 @@ namespace AppReservation.Data
         }
 
         public virtual DbSet<Student> Students { get; set; }
-        public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<Reservation> Reservations { get; set; }
         public virtual DbSet<TypeReservation> TypeReservations { get; set; }
 

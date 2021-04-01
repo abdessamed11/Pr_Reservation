@@ -28,19 +28,15 @@ namespace AppReservation.Controllers
             _toastNotification = toastNotification;
         }
 
-        public IActionResult Idx()
+        public IActionResult Resby_res()
         {
-
-            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv)
-                
-                .OrderBy(c => c.Student.ResCount);
-            
+            var toutlist = _context.Reservations.Include(s => s.Student).Include(tr => tr.Reserv).OrderBy(s => s.Student.ResCount).ToList();
             ViewBag.role = new IdentityRole();
-            return View(list.ToList().Where(d => d.Date >= DateTime.Today||d.Date.DayOfWeek == DayOfWeek.Saturday || d.Date.DayOfWeek == DayOfWeek.Sunday));
+            return View(toutlist.Where(d => d.Date >= DateTime.Today||d.Date.DayOfWeek == DayOfWeek.Saturday || d.Date.DayOfWeek == DayOfWeek.Sunday));
                 
         }
 
-        public IActionResult Idxx()
+        public IActionResult Res_Approved()
         {
 
             var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv);
@@ -50,7 +46,7 @@ namespace AppReservation.Controllers
 
         }
 
-        public IActionResult Idxxx()
+        public IActionResult Res_Declined()
         {
 
             var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv);
@@ -58,6 +54,14 @@ namespace AppReservation.Controllers
             ViewBag.role = new IdentityRole();
             return View(list.ToList().Where(d => d.Status == "Declined" && d.Date >= DateTime.Today));
 
+        }
+
+        public ActionResult Filtre()
+        {
+            var student = _userManager.GetUserId(HttpContext.User);
+            var toutlist = _context.Reservations.Include(s => s.Student).Include(tr => tr.Reserv).OrderBy(s => s.Student.ResCount).ToList();
+            return View(toutlist.Where(d => d.Date >= DateTime.Today));
+            
         }
 
         public IActionResult Pend()
@@ -73,26 +77,25 @@ namespace AppReservation.Controllers
         [HttpPost]
         public ActionResult Index(DateTime? dates)
         {
-            var tb_visitas = _context.Reservations
+            var dateres = _context.Reservations
                 .Include(s => s.Student)
                 .Include(rt => rt.Reserv)
               .Where(t => t.Date == dates);
-            return View(tb_visitas.ToList());
+            return View(dateres.ToList());
         }
 
         public async Task<IActionResult> Approuved()
         {
             
-
             if (User.Identity.IsAuthenticated)
             {
                 if (User.IsInRole("Student"))
                 {
-                    await GetDataByUser();
+                    await DataByUser();
                 }
                 else if (User.IsInRole("Admin"))
                 {
-                    Idxx();
+                    Res_Approved();
                 }
                 else
                 {
@@ -109,11 +112,11 @@ namespace AppReservation.Controllers
             {
                 if (User.IsInRole("Student"))
                 {
-                    await GetDataByUser();
+                    await DataByUser();
                 }
                 else if (User.IsInRole("Admin"))
                 {
-                    Idxxx();
+                    Res_Declined();
                 }
                 else
                 {
@@ -130,7 +133,7 @@ namespace AppReservation.Controllers
             {
                 if (User.IsInRole("Student"))
                 {
-                    await GetDataByUser();
+                    await DataByUser();
                 }
                 else if (User.IsInRole("Admin"))
                 {
@@ -151,11 +154,11 @@ namespace AppReservation.Controllers
             {
                 if (User.IsInRole("Student"))
                 {
-                    await GetDataByUser();
+                    await DataByUser();
                 }
                 else if (User.IsInRole("Admin"))
                 {
-                    Idx();
+                    Resby_res();
                 }
                 else
                 {
@@ -166,11 +169,15 @@ namespace AppReservation.Controllers
 
         }
 
-        public async Task<IActionResult> GetDataByUser()
+        
+
+        public async Task<IActionResult> DataByUser()
         {
             var student = await _userManager.GetUserAsync(HttpContext.User);
-            var list = _context.Reservations.Include(s => s.Student).Include(rt => rt.Reserv).Where(s => s.StudentId == student.Id);
-            return View("Index", list.ToList());
+            var list = _context.Reservations.Where(d=>d.Date>=DateTime.Today).OrderBy(r=>r.Date)
+                .Include(s => s.Student)
+                .Include(rt => rt.Reserv).Where(s => s.StudentId == student.Id).ToList();
+            return View("Index",list);
         }
 
         // GET: ReservationController/Details/5
@@ -271,21 +278,34 @@ namespace AppReservation.Controllers
 
         public void Increment(int id)
         {
-            var usr = _context.Reservations.Find(id);
-            //var res = new Student();
-            //var inc = usr.Student.resCount;
-            //var incr = new Student().resCount;
-            
-            //var student = await _userManager.GetUserAsync(HttpContext.User);
+            var usr = _context.Reservations.Find(id);          
             var u = _context.Students.FirstOrDefault(s => s.Id == usr.StudentId);
             var inc = usr.Student.ResCount;
-            u.ResCount = inc + 1;
-            //int inc = Convert.ToInt32(usr.Student.resCount.ToString());
-            //res.resCount += inc;
-            //usr.Student.resCount = incr + 1;
-            _context.Update(usr);
-            _context.Update(u);
-             _context.SaveChanges();
+            var st = usr.Status;
+            if(st!= "Approved")
+            {
+                u.ResCount = inc + 1;
+                _context.Update(usr);
+                _context.Update(u);
+                _context.SaveChanges();
+            }
+            
+        }
+
+        public void Decrement(int id)
+        {
+            var usr = _context.Reservations.Find(id);
+            var u = _context.Students.FirstOrDefault(s => s.Id == usr.StudentId);
+            var inc = usr.Student.ResCount;
+            var st = usr.Status;
+            if (st == "Approved")
+            {
+                u.ResCount = inc - 1;
+                _context.Update(usr);
+                _context.Update(u);
+                _context.SaveChanges();
+            }
+
         }
 
         public async Task<IActionResult> Confirm(int id)
@@ -308,28 +328,7 @@ namespace AppReservation.Controllers
             return RedirectToAction("index");
         }
 
-        //public IActionResult tconfirm()
-        //{
-        //    var Result = (from c in _context.Reservations.Where(c => c.Status == "pending") select c).Single();
-
-        //    Result.Status = "approuved";
-
-        //    _context.Update(Result);
-        //    _context.SaveChanges();
-        //    return RedirectToAction("Index");
-
-        //}
-        //[HttpGet]
-        //public async Task<IActionResult> Index(string searchString)
-        //{
-        //    ViewData["getetudiant"] = searchString;
-        //    var etudquery = from x in _context.Reservations select x;
-        //    if (!string.IsNullOrEmpty(searchString))
-        //    {
-        //        etudquery = etudquery.Where(x => x.Cause.Contains(searchString));
-        //    }
-        //    return View(await etudquery.AsNoTracking().ToListAsync());
-        //}
+        
 
         public IActionResult Decline(int id)
         {
@@ -337,7 +336,11 @@ namespace AppReservation.Controllers
 
             if (resr.Status != "Declined")
             {
-                //var app = new Reservation();
+                if(resr.Status == "Approved")
+                {
+                    Decrement(id);
+                }
+                
                 resr.Status = "Declined";
                 _context.Update(resr);
                 _context.SaveChanges();
