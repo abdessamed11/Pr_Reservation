@@ -100,7 +100,7 @@
                     else if (User.IsInRole("Admin"))
                     {
                     <div class="input-group mb-3">
-                        <a class="btn btn-primary" asp-action="Confirm" asp-route-id="@item.Id">Confirm</a>
+                        <a class="btn btn-primary mr-2" asp-action="Confirm" asp-route-id="@item.Id">Confirm</a>
                         <div class="input-group-append">
                             <a class="btn btn-danger" asp-action="Decline" asp-route-id="@item.Id">Decline</a>
                         </div>
