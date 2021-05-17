@@ -41,6 +41,7 @@ namespace AppReservation
                 options.Password.RequiredLength = 4;
                 options.Password.RequireDigit = false;
                 options.Password.RequiredUniqueChars = 0;
+                
             })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();

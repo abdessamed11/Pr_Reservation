@@ -86,9 +86,25 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Reserv.name)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
+            @if (item.Status == "pending")
+            {
+                <td style="color: darkgoldenrod;font-size: large;">
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+            }
+            else if (item.Status == "Approved")
+            {
+                <td style="color: green;font-size: large;">
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+            }
+            else
+            {
+                <td style="color: blueviolet;font-size: large;">
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+            }
+
             <td>
                 @if (User.Identity.IsAuthenticated)
                 {
@@ -99,25 +115,25 @@
                     }
                     else if (User.IsInRole("Admin"))
                     {
-                    <div class="input-group mb-3">
-                        <a class="btn btn-primary mr-2" asp-action="Confirm" asp-route-id="@item.Id">Confirm</a>
-                        <div class="input-group-append">
-                            <a class="btn btn-danger" asp-action="Decline" asp-route-id="@item.Id">Decline</a>
+                        <div class="input-group mb-3">
+                            <a class="btn btn-primary mr-2" asp-action="Confirm" asp-route-id="@item.Id">Confirm</a>
+                            <div>
+                                <a class="btn btn-danger" asp-action="Decline" asp-route-id="@item.Id">Decline</a>
+                            </div>
+
                         </div>
-                
-                    </div>
-                
-                }
-                else
-                {
-                <a hidden class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a hidden class="btn btn-primary" asp-action="Confirm" asp-route-id="@item.Id">Confirm</a>
-                <a hidden class="btn btn-danger" asp-action="Decline" asp-route-id="@item.Id">Decline</a>
-                }
+
+                    }
+                    else
+                    {
+                        <a hidden class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a hidden class="btn btn-primary" asp-action="Confirm" asp-route-id="@item.Id">Confirm</a>
+                        <a hidden class="btn btn-danger" asp-action="Decline" asp-route-id="@item.Id">Decline</a>
+                    }
 
                 }
 
-</td>
+            </td>
         </tr>
         }
     </tbody>

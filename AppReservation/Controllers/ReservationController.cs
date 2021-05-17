@@ -27,7 +27,8 @@ namespace AppReservation.Controllers
             _roleManager = roleManager;
             _toastNotification = toastNotification;
         }
-
+        #region filtre by rescount
+        
         public IActionResult Resby_res()
         {
             var toutlist = _context.Reservations.Include(s => s.Student).Include(tr => tr.Reserv).OrderBy(s => s.Student.ResCount).ToList();
@@ -35,7 +36,9 @@ namespace AppReservation.Controllers
             return View(toutlist.Where(d => d.Date >= DateTime.Today||d.Date.DayOfWeek == DayOfWeek.Saturday || d.Date.DayOfWeek == DayOfWeek.Sunday));
                 
         }
+        #endregion
 
+        #region affichage reservation approuved
         public IActionResult Res_Approved()
         {
 
@@ -45,7 +48,9 @@ namespace AppReservation.Controllers
             return View(list.ToList().Where(d => d.Status == "Approved" && d.Date >= DateTime.Today));
 
         }
+        #endregion
 
+        #region affichage reservation declined
         public IActionResult Res_Declined()
         {
 
@@ -55,7 +60,9 @@ namespace AppReservation.Controllers
             return View(list.ToList().Where(d => d.Status == "Declined" && d.Date >= DateTime.Today));
 
         }
+        #endregion
 
+        #region reservation date aoujourd'hui
         public ActionResult Filtre()
         {
             var student = _userManager.GetUserId(HttpContext.User);
@@ -63,7 +70,9 @@ namespace AppReservation.Controllers
             return View(toutlist.Where(d => d.Date >= DateTime.Today));
             
         }
+        #endregion
 
+        #region reservation pending
         public IActionResult Pend()
         {
 
@@ -73,7 +82,9 @@ namespace AppReservation.Controllers
             return View(list.ToList().Where(d => d.Status == "pending" && d.Date >= DateTime.Today));
 
         }
+        #endregion
 
+        #region search par date 
         [HttpPost]
         public ActionResult Index(DateTime? dates)
         {
@@ -83,7 +94,9 @@ namespace AppReservation.Controllers
               .Where(t => t.Date == dates);
             return View(dateres.ToList());
         }
+#endregion
 
+        
         public async Task<IActionResult> Approuved()
         {
             
